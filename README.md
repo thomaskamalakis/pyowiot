@@ -1,5 +1,5 @@
 # pyowiot
-This is an open-source Python library that can be used to design optical wireless systems for internet-of-things (IoT) applications
+This is an open-source Python3 library that can be used to design optical wireless systems for internet-of-things (IoT) applications
 
 ## Funding support
 We wrote this code under COST action NewFocus CA19111.
@@ -14,4 +14,11 @@ The PHY model deals with all sorts of details of the communications system inclu
   - receiver model: spectral matching, responsivity, optical rejection filter, ambient light noise, amplifier noise.
 
 ## Requirements
-It requires `scipy`, `numpy` and `matplotlib`
+It requires `scipy`, `numpy` and `matplotlib`. Install them using `pip3`
+
+## How to use it
+`libow.py` is the library file, `sysdesign_wide.py` is an example of how to use the library. Basically you need to define the system parameters one step at the time for each subsystem of the VLC/IR link. At the very least, you need to specify the following things in a bottom up approach.
+
+### Master node transimpendance amplifier (TIA)
+
+
