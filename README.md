@@ -29,5 +29,5 @@ tia_master = TIA(RF = 1e6,
                  fncV = 1e3,
                  temperature = 300)
 ```
-This defines a transimpendance amplifier (TIA) for the master node with a feedback resistor equal to 10^6Ω
+This defines a transimpendance amplifier (TIA) for the master node with a feedback resistor equal to 10<sup>6</sup>Ω
 
