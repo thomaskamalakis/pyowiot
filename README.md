@@ -29,6 +29,6 @@ tia_master = TIA(RF = 1e6,
                  fncV = 1e3,
                  temperature = 300)
 ```
-This defines a transimpendance amplifier (TIA) for the master node with a feedback resistor equal to 10<sup>6</sup>Ω, a feedback capacitance 1nF, at temperature equal to 300K, assuming 15nV and 400fA noise root mean square (RMS) amplitudes for the operational amplifier of the TIA and 1kHz corner frequencies for these noises. See a full explanation of noise characteristics of the opamp [here] (https://www.ti.com/lit/an/slva043b/slva043b.pdf)
+This defines a transimpendance amplifier (TIA) for the master node with a feedback resistor equal to 10<sup>6</sup>Ω, a feedback capacitance 1nF, at temperature equal to 300K, assuming 15nV and 400fA noise root mean square (RMS) amplitudes for the operational amplifier of the TIA and 1kHz corner frequencies for these noises. See a full explanation of noise characteristics of the opamp [here](https://www.ti.com/lit/an/slva043b/slva043b.pdf)
  
 
