@@ -19,6 +19,14 @@ It requires `scipy`, `numpy` and `matplotlib`. Install them using `pip3`
 ## How to use it
 `libow.py` is the library file, `sysdesign_wide.py` is an example of how to use the library. Basically you need to define the system parameters one step at the time for each subsystem of the VLC/IR link. At the very least, you need to specify the following things in a bottom up approach.
 
-### Master node transimpendance amplifier (TIA)
+### Master node transimpendance amplifier (MN-TIA)
+
+`tia_master = TIA(RF = 1e6,
+                 CF = 1e-9,
+                 Vn = 15e-9,
+                 In = 400e-15,
+                 fncI = 1e3,
+                 fncV = 1e3,
+                 temperature = 300)`
 
 
