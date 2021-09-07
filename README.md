@@ -9,4 +9,9 @@ We can use this library to simulate a typical optical wireless system used for I
 
 # PHY model
 The PHY model deals with all sorts of details of the communications system including:
-  - transmitter model: radiation pattern (Lorentzian or extended Lorentzian).
+  - transmitter model: radiation pattern (Lorentzian or extended Lorentzian), light/current characteristic.
+  - channel gain: line-of-sight components from the MN to the SN and vice-versa.
+  - receiver model: spectral matching, responsivity, optical rejection filter, ambient light noise, amplifier noise.
+
+# Requirements
+It requires `scipy`, `numpy` and `matplotlib`
