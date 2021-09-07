@@ -29,6 +29,30 @@ tia_master = TIA(RF = 1e6,
                  fncV = 1e3,
                  temperature = 300)
 ```
-This defines a transimpendance amplifier (TIA) for the master node with a feedback resistor equal to 10<sup>6</sup>Ω, a feedback capacitance 1nF, at temperature equal to 300K, assuming 15nV and 400fA noise root mean square (RMS) amplitudes for the operational amplifier of the TIA and 1kHz corner frequencies for these noises. See a full explanation of noise characteristics of the opamp [here](https://www.ti.com/lit/an/slva043b/slva043b.pdf)
+This defines a transimpendance amplifier (TIA) for the master node with a feedback resistor equal to 10<sup>6</sup>Ω, a feedback capacitance 1nF, at temperature equal to 300K, assuming 15nV and 400fA noise root mean square (RMS) amplitudes for the operational amplifier of the TIA and 1kHz corner frequencies for these noises. See a full explanation of noise characteristics of the opamp [here](https://www.ti.com/lit/an/slva043b/slva043b.pdf).
+
+### Sensor node transimpendance amplifier (SN-TIA)
+```
+tia_nodes = TIA(RF = 1e6,
+                CF = 1e-9,
+                Vn = 15e-9,
+                In = 400e-15,
+                fncI = 1e3,
+                fncV = 1e3,
+                temperature = 300)
+```
+This is pretty much the same except it is for the SNs.
+
+### Sensor driver circuit
+```
+sensor_driver = driver(imax = 100e-3,
+                       imin = 0e-3,
+                       pol = np.array([ 1.35376064e-01,  1.86846949e-01, -1.01789073e-04]),
+                       polinv = np.array([-1.74039667e+01, 5.32917840e+00, 5.61867428e-04]) )
+```
+This defines the light/current and current/light characteristic using `numpy` polyomials, `pol` and `polinv` respectively, while `imin` and `imax` define the range where these polynomials are valid.   
+
+
+
  
 
