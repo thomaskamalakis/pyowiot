@@ -43,7 +43,7 @@ tia_nodes = TIA(RF = 1e6,
 ```
 This is pretty much the same except it is for the SNs.
 
-### Sensor driver circuit
+### LED and driver circuit
 ```
 sensor_driver = driver(imax = 100e-3,
                        imin = 0e-3,
@@ -52,6 +52,21 @@ sensor_driver = driver(imax = 100e-3,
 ```
 This defines the light/current and current/light characteristic using `numpy` polyomials, `pol` and `polinv` respectively, while `imin` and `imax` define the range where these polynomials are valid.   
 
+### Master node (MN)
+```
+master = nodes(r = np.array([L/2, W/2, H]),
+               FOV = np.pi/2.0,
+               A = 1e-4,
+               m = 1,
+               n = -constants.ez,
+               SpecT = spectra.white_led(l),
+               SpecR = spectra.visible_drop_filter(l),
+               R = spectra.pin_resp(l),
+               PT = 6,
+               TIA = tia_master,
+               sp_eff = 0.4)
+```
+This defines a master node positioned at `r`, with a field-of-view `FOV`, area equal to `A` (measured in m<sup>2</sup>), with lambertian order `m`, orientation normal vector `n`.
 
 
  
