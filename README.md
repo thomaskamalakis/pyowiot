@@ -9,4 +9,4 @@ We can use this library to simulate a typical optical wireless system used for I
 
 # PHY model
 The PHY model deals with all sorts of details of the communications system including:
--transmitter model: radiation pattern (Lorentzian or extended Lorentzian).
+  - transmitter model: radiation pattern (Lorentzian or extended Lorentzian).
