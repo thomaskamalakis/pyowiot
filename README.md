@@ -69,8 +69,30 @@ master = nodes(r = np.array([L/2, W/2, H]),
 This defines a master node positioned at `r`, with a field-of-view `FOV`, area equal to `A` (measured in m<sup>2</sup>), with lambertian order `m`, orientation normal vector `n`. `SpecT`, `SpecR` and `R` are the transmission spectra, the optical receiver filter characteristic and the responsivity. The class `spectra` defines some common spectrum models that can be used, see the code documentation for more info. `PT` is the transmission power, `TIA` is the TIA amplifier description (see above) and `sp_eff` is the spectral efficiency.
 
 ### Sensor nodes (SNs)
-You can define multiple
-
+You can define multiple sensor nodes (SNs) located at different positions in the room. One quick way to do this is to place all SNs on a plane (say parallel to the floor). To do this, we use the `grid_of_points` class.
+```
+r_sg = grid_of_points( r0 = constants.O, 
+                       dr1 = L * constants.ex, 
+                       dr2 = W * constants.ey, 
+                       N1 = N1, 
+                       N2 = N2 )
+r_s = r_sg.r
+```
+This defines a set of points located on a grid on a plane surface parallel to the floor. `r0` is the plane surface origin and `dr1` and `dr2` define the orientation and size of the plane surface. The continuous surface contains all points `r0 + I * dr1 + J * dr2` where `I` and `J` range from 0 to 1. The actual grid points are taken inside the surface `r0 + (i + 0.5) * dr1 + (j + 0.5) * dr2` where `i` and `j` range from 0 to `N1-1` and `N2-1` respectively. We next use the `nodes` class to define the sensor nodes as well.
+```
+n_s = constants.ez
+sensors = nodes(r = r_s,
+                FOV = np.pi/2, 
+                A = 1e-4, 
+                m = 1,
+                n = n_s,
+                SpecT = spectra.ir_led(l),
+                SpecR = spectra.ir_drop_filter(l),
+                R = spectra.pin_resp(l),
+                PT = 25e-3,
+                TIA = tia_nodes, 
+                sp_eff = 0.4)
+```
 
 
 
