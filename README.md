@@ -78,7 +78,7 @@ r_sg = grid_of_points( r0 = constants.O,
                        N2 = N2 )
 r_s = r_sg.r
 ```
-This defines a set of points located on a grid on a plane surface parallel to the floor. `r0` is the plane surface origin and `dr1` and `dr2` define the orientation and size of the plane surface. The continuous surface contains all points `r0 + I * dr1 + J * dr2` where `I` and `J` range from 0 to 1. The actual grid points are taken inside the surface `r0 + (i + 0.5) * dr1 + (j + 0.5) * dr2` where `i` and `j` range from 0 to `N1-1` and `N2-1` respectively. We next use the `nodes` class to define the sensor nodes as well.
+This defines a set of points located on a grid on a plane surface parallel to the floor. `r0` is the plane surface origin and `dr1` and `dr2` define the orientation and size of the plane surface. The continuous surface contains all points `r0 + I * dr1 + J * dr2` where `I` and `J` range from 0 to 1. The actual grid points are taken inside the surface `r0 + (i + 0.5) * dr1 / N1 + (j + 0.5) * dr2 / N2` where `i` and `j` range from 0 to `N1-1` and `N2-1` respectively. We next use the `nodes` class to define the sensor nodes as well.
 ```
 n_s = constants.ez
 sensors = nodes(r = r_s,
