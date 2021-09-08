@@ -129,6 +129,20 @@ sn.calc_snr()             # signal-to-noise calculation assuming on/off keying (
 ```
 
 ### Energy usage
-
- 
+The `sensor_consumption` class can be used to estimate the energy usage of an SN node. Example:
+```
+c = sensor_consumption(IWU = 1.3e-3,      # Wake up current of the micro controller unit (MCU) of the node [Amps]
+                       tWU = 20e-3,       # Duration of the wake up phase [seconds]                       
+                       IRO = 1.3e-3,      # Current drawn during read-out (RO) phase [Amps]
+                       tRO = 40e-3,       # Duration of the read-out phase [seconds]
+                       IRX = 1.3e-3,      # Current drawn during listening phase [Amps]
+                       Ldatau = 200,      # Length of message to be transmitted at the MN [bits]
+                       Ldatad = 200,      # Length of message to be received by the MN [bits]
+                       Rbu = 1e3,         # Uplink data rate [b/s]
+                       Rbd = 1e3,         # Downlink data rate [b/s]
+                       ID = 10e-3,        # LED driving current [Amps]
+                       Tcycle = 10,       # Total cycle duration [seconds]
+                       ISL = 400e-9,      # Sleep mode current [Amps]
+                       QmAh = 220)        # battery capacity [mAh]
+ ```
 
