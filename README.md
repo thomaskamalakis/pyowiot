@@ -107,11 +107,28 @@ window = plane_surface(dr1 = np.array([1, 0, 0]),
                        pd_peak = pd_peak)
 ```
 The parameters `N1`, `N2`, `dr1` and `dr2` are the same as in `grid_of_points`. We now specify the middle of the plane surface `rm` and also provide the wavelength range  `l`, the orientation of the surface  `n` and the  peak spectral irradiance `pd_peak`
+
 ### The sensor_net class
+At the top level, we use the `sensor_net` class to define our topology.
+```
+amb_surfs = [window]
+sn = sensor_net(master = master,
+                sensors = sensors,
+                l = l,
+                sensor_driver = sensor_driver,
+                data_rates_u = data_rates_u,
+                data_rates_d = data_rates_d,
+                amb_surfs = amb_surfs)
+```
+We can then use the following code to calculate the PHY performance:
+```
+sn.calc_downlink()        # Downlink channel gain
+sn.calc_uplink()          # Uplink channel gain
+sn.calc_ambient_light()   # Ambient light sources
+sn.calc_snr()             # signal-to-noise calculation assuming on/off keying (OOK)
+```
 
-
-
-
+### Energy usage
 
  
 
