@@ -17,7 +17,7 @@ The PHY model deals with all sorts of details of the communications system inclu
 It requires `scipy`, `numpy` and `matplotlib`. Install them using `pip3`
 
 ## How to use it
-`libow.py` is the library file, `sysdesign_wide.py` is an example of how to use the library. Basically you need to define the system parameters one step at the time for each subsystem of the VLC/IR link. At the very least, you need to specify the following things in a bottom up approach.
+`libow.py` is the library file, `sysdesign_wide.py` is an example of how to use the library. Basically you need to define the system parameters one step at the time for each subsystem of the VLC/IR link. At the very least, you need to specify the following things in a bottom up approach. Here are some important points from `sysdesign_wide.py` you need to pay attention to.
 
 ### Master node transimpendance amplifier (MN-TIA)
 ```
@@ -66,7 +66,14 @@ master = nodes(r = np.array([L/2, W/2, H]),
                TIA = tia_master,
                sp_eff = 0.4)
 ```
-This defines a master node positioned at `r`, with a field-of-view `FOV`, area equal to `A` (measured in m<sup>2</sup>), with lambertian order `m`, orientation normal vector `n`.
+This defines a master node positioned at `r`, with a field-of-view `FOV`, area equal to `A` (measured in m<sup>2</sup>), with lambertian order `m`, orientation normal vector `n`. `SpecT`, `SpecR` and `R` are the transmission spectra, the optical receiver filter characteristic and the responsivity. The class `spectra` defines some common spectrum models that can be used, see the code documentation for more info. `PT` is the transmission power, `TIA` is the TIA amplifier description (see above) and `sp_eff` is the spectral efficiency.
+
+### Sensor nodes (SNs)
+You can define multiple
+
+
+
+
 
 
  
