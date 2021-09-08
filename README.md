@@ -91,8 +91,23 @@ sensors = nodes(r = r_s,
                 R = spectra.pin_resp(l),
                 PT = 25e-3,
                 TIA = tia_nodes, 
-                sp_eff = 0.4)
+                sp_eff = 0.4)                
 ```
+### Ambient light sources
+We can define surfaces that emit ambient light (windows, etc). The `plane_surface` class is the way to do this.```
+```
+window = plane_surface(dr1 = np.array([1, 0, 0]), 
+                       dr2 = np.array([0, 0, 1]),
+                       rm = np.array([2.5, 5, 1.5]),
+                       N1 = 10,
+                       N2 = 10,
+                       m = 1,
+                       l = l,
+                       n = -constants.ey,
+                       pd_peak = pd_peak)
+```
+The parameters `N1`, `N2`, `dr1` and `dr2` are the same as in `grid_of_points`. We now specify the middle of the plane surface `rm` and also provide the wavelength range  `l`, the orientation of the surface  `n` and the  peak spectral irradiance `pd_peak`
+### The sensor_net class
 
 
 
