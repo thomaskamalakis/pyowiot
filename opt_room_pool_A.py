@@ -40,16 +40,16 @@ y = W * np.arange(1, Nx + 1) / (Nx+1)
 
 h_ww = None
         
-def sensor_ar(theta_t, phi_t, Rb, angle, FOM, KEY = None): 
+def sensor_ar(theta_t, phi_t, Rb, angle, FOM, r_sensor = None, params_d = None): 
     global h_ww
-    global designs
     angle_rad = np.pi/180 * angle
     m = ut.half_angle_to_order(angle_rad)
     nS = ut.spher_to_cart_ar(1, theta_t, phi_t)
-    designs[KEY]['nS_sensor'] = nS
-    designs[KEY]['Rb_sensor'] = Rb 
-    designs[KEY]['m_sensor'] = int(m)
-    l = sensor_net( **designs[KEY] ) 
+    params_d['r_sensor'] = r_sensor
+    params_d['nS_sensor'] = nS
+    params_d['Rb_sensor'] = Rb 
+    params_d['m_sensor'] = int(m)
+    l = sensor_net( **params_d ) 
     l.calch(h_ww = h_ww)
     l.light_sim()
     l.calc_noise()
@@ -61,17 +61,17 @@ def sensor_ar(theta_t, phi_t, Rb, angle, FOM, KEY = None):
 
 def ga_optimization(d):
     global h_ww
-    global designs
     i = d['i']
     j = d['j']
     x = d['x']
     y = d['y']
+    designs = d['designs']
     KEY = d['KEY']
     FOM = d['FOM']
-    fitness_fun = lambda params: sensor_ar(params[0], params[1], params[2], 60, FOM, KEY = KEY)
-    
     r_sensor = np.array([x, y, 0])
-    designs[KEY]['r_sensor'] = r_sensor
+    fitness_fun = lambda params: sensor_ar(params[0], params[1], params[2], 60, FOM, r_sensor = r_sensor, 
+                                           params_d = designs[KEY])    
+
     print('i = %d / %d, j = %d / %d sensor at %s, initiating pool.' %(i, x.size, j, y.size, r_sensor) )              
     
     g = ga.population( noChromosomes = 50,
@@ -134,7 +134,8 @@ for i, xc in enumerate(x):
          'x' : xc,
          'y' : yc,
          'KEY' : KEY,
-         'FOM' : 'tb_diff'
+         'FOM' : 'tb_diff',
+         'designs' : designs
         })
     
     pool_args.append({'i' : i,
@@ -142,7 +143,9 @@ for i, xc in enumerate(x):
          'x' : xc,
          'y' : yc,
          'KEY' : KEY,
-         'FOM' : 'tb_tot'
+         'FOM' : 'tb_tot',
+         'designs' : designs
+
         })
     
     pool_args.append({'i' : i,
@@ -150,11 +153,13 @@ for i, xc in enumerate(x):
          'x' : xc,
          'y' : yc,
          'KEY' : KEY,
-         'FOM' : 'tb_los'
+         'FOM' : 'tb_los',
+         'designs' : designs
+
         })
     
          
-pool = Pool(processes = 16)
+pool = Pool(processes = 1)
 results = pool.map_async( ga_optimization, pool_args ).get()
 with open(FILENAME, 'wb') as f:
     pickle.dump(results, f)

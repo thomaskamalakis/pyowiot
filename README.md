@@ -1,4 +1,4 @@
-# pyowiot
+# Pyowiot
 `Pyowiot` is an open-source Python3 library that can be used to design optical wireless systems for internet-of-things (IoT) applications. It contains many components describing the optical wireless channel and transceiver model as well as an optimization engine based on a genetic algorithm.
 
 ## Funding support
@@ -7,7 +7,7 @@ We wrote this code under COST action NewFocus CA19111. Official acknowledgment i
 > This software was based upon work from COST Action
 NEWFOCUS CA19111, supported by COST (European Cooperation in Science and Technology)
 
-## What is all about?
+## What is it all about?
 We can use this library to simulate a typical optical wireless system used for IoT. We assume a master node (MN) placed somewhere in a room (preferably the ceiling). The master node uses visible light communications (VLC) to send acknowledgment messages to sensor nodes (SNs) also placed inside the room. There are two main components of the model: the physical layer (PHY) and the power consumption model (PCM). Typically we expect the SN transmitted to be in the infrared (IR) range, e.g. an IR light emitting diode (LED). On the other hand, the MN would use a visible LED which could provide both illumination in the room and communication with the SNs.
 
 ## PHY model
@@ -51,7 +51,9 @@ Basically you need to define the system parameters one step at the time for each
 At this stage, it is preferable to start from one quick-start example (e.g.`opt_room_pool_A.py`) and work your way through. Taking `opt_room_pool_A.py` as a starting point:
 
 - provide a file where your results will be stored. The `FILENAME` variable is used for this purpose.
-- define a variable map type for the genetic algorithm. In this example we run the optimizations over three real-valued variables: elevation, azimuth and data rate. So the map is 
+
+### GA setup
+define a variable map type for the genetic algorithm. In this example we run the optimizations over three real-valued variables: elevation, azimuth and data rate. So the map is 
 ```
 map_type = 'R' * 3`
 ```
@@ -65,6 +67,7 @@ mins = np.array([0, 0, 1e3])
 signifies that the first two variables (elevation and azimuth) will have minimum value equal to zero and the third (data rate) will have a minimum value of `1e3` (i.e., 1 kb/s ). In a similar fashion 
 `maxs` determines the upper bounds for these parameters.
 
+### Sensor node positions
 You then define the positions of the sensor nodes to be considered. 
 ```
 Nx = 30
@@ -75,9 +78,101 @@ y = W * np.arange(1, Nx + 1) / (Nx+1)
 ```
 creates a set of 30 x and y pairs corresponding to the diagonal of the ceiling.
 
-Note that the `h_ww` is a global variable that is used in diffuse channel calculations. It represents the gains between all elementary subsurfaces of the room that are used in the diffuse channel model. You only need to calculate this once, since they are independent on the parameters of the SN and MN
+### Initial subsurface gains
+Note that the `h_ww` is a global variable that is used in diffuse channel calculations. It represents the gains between all elementary subsurfaces of the room that are used in the diffuse channel model. You only need to calculate this once, since they are independent on the parameters of the SN and MN. We initially set 
+```
+h_ww = None
+```
+so that the gains are calculated the first time they are needed (and used afterwards in subsequent calculation)
 
-We next define a function `sensor_ar` that is used to estimate the battery life of an SN. The battery life is the fitness function, i.e. the measure to be used in the optimizations.
+### Optimization objective function
+
+We next define a auxiliary function `sensor_ar` that is used to estimate the battery life of an SN under a specific sensor arrangement. The battery life is the fitness function, i.e. the optimization objective to be used in the optimizations. The function accepts several input variables:
+
+```
+sensor_ar(theta_t, phi_t, Rb, angle, FOM, KEY = None, designs = designs) 
+```
+where `theta_t` is the elevation angle, `phi_t` is the azimuth (both measured in radians), `Rb` is the data rate (b/s), `angle` is the beamwidth of the SN beam (this one is measured in degrees). `FOM` specifies under which conditions the battery life will be calculated:
+- `FOM = 'tb_los'` implies only LOS component will be accounted for,
+- `FOM = 'tb_diff'` implies only diffuse component will be accounted for,
+- `FOM = 'tb_tot'` implies both LOS and diffuse components will be accounted for.
+
+The variable `designs` is a dictionary of the form:
+```
+designs = {
+  design_key :  {
+    'room_L' : room length,
+    'room_W' : room width,
+    'room_H' : room height,
+    'refl_north' : north wall reflectivity,
+    'refl_south' : south wall reflectivity,
+    'refl_east' : east wall reflectivity,
+    'refl_west' : west wall reflectivity,
+    'refl_ceiling' : ceiling reflectivity,
+    'refl_floor' : floor reflectivity,
+    'm_sensor' : sensor transmitter Lambertian order,
+    'r_sensor' : sensor position,
+    'm_master' : master node transmitter Lambertian order,
+    'r_master' : master node position,
+    'FOV_master' : master node field-of-view (FOV) [rad],
+    'FOV_sensor' : sensor node field-of-view (FOV) [rad],
+    'amb_L1' : ambient light source size (horizontal),
+    'amb_L2' : ambient light source size (vertical),
+    'nR_sensor' : sensor receiver orientation,
+    'nS_sensor' : sensor transmitter orientation,
+    'nR_master' : master node receiver orientation,
+    'nS_master' : master node transmitter orientation,
+    'no_bounces' : number of light bounces considered in the simulation,
+    'Rb_master' : master node data rate,
+    'Rb_sensor' : sensor node data rate,
+    'PT_sensor' : sensor node transmit power,
+    'PT_master' : master node transmit power,
+    'A_master' : effective area of master node receiver,
+    'A_sensor' : effective area of sensor node receiver
+    },...
+```
+
+Example:
+```
+designs = {
+  'A' :  {
+    'room_L' : 5,
+    'room_W' : 5,
+    'room_H' : 3,
+    'refl_north' : 0.8,
+    'refl_south' : 0.8,
+    'refl_east' : 0.8,
+    'refl_west' : 0.8,
+    'refl_ceiling' : 0.8,
+    'refl_floor' : 0.3,
+    'm_sensor' : 1,
+    'r_sensor' : np.array([2.5, 2.5, 0]),
+    'm_master' : 1,
+    'r_master' : np.array([2.5, 2.5, 3]),
+    'FOV_master' : np.pi / 2.0,
+    'FOV_sensor' : np.pi / 2.0,
+    'amb_L1' : 1.0,
+    'amb_L2' : 1.0,
+    'nR_sensor' : constants.ez,
+    'nS_sensor' : constants.ez,
+    'nR_master' : -constants.ez,
+    'nS_master' : -constants.ez,
+    'no_bounces' : 4,
+    'Rb_master' : 10e3,
+    'Rb_sensor' : 10e3,  
+    'PT_sensor' : 25e-3,
+    'PT_master' : 6,
+    'A_master' : 1e-4,
+    'A_sensor' : 1e-4
+    }
+```
+
+In the quick-start example `opt_room_pool_A.py`, the values of `Rb_sensor`, `nS_sensor`, `rS_sensor` and `m_sensor` are overwritten by the arguments of the `sensor_ar` function.
+
+We also define the `ga_optimization` function which carries out the GA optimization. Note that this function is passed to the `Pool` instance at the end of the file.
+
+## The defaults class
+If some parameters are omitted, an effort will be made to get their values from the class `defaults` that is defined in `defaults.py`. Here is some information regarding classes contained in `libow8.py` and the parameters found in `defaults`
 
 ### Master node transimpendance amplifier (MN-TIA)
 ```

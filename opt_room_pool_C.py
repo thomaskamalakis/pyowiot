@@ -23,10 +23,6 @@ plt.rcParams.update({
     "font.size" : 14,
     "lines.linewidth" : 2,
 })
-COMPUTE = True
-DO_PLOTS = True
-FOMs_latex = ['t_\mathrm{b}^{\mathrm{LOS}}', 't_\mathrm{b}^{\mathrm{TOT}}', 't_\mathrm{b}^{\mathrm{DIFF}}']
-TITLES = ['Diffuse only']
 PREFIX = 'diagonal'
 KEY = 'C'
 FILENAME = PREFIX + '_' + KEY + '.pickle'
@@ -35,26 +31,25 @@ map_type = 'R' * 3
 mins = np.array([0, 0, 1e3])
 maxs = np.array([np.pi/2.0, 2 * np.pi, 10e3])
 Nparams = len(map_type)
+
 Nx = 30
-h_ww = None
 L = designs[KEY]['room_L']
 W = designs[KEY]['room_W']    
 x = L * np.arange(1, Nx + 1) / (Nx+1)
 y = W * np.arange(1, Nx + 1) / (Nx+1)
 
-# Check if filename exists. If so this could mean the run was not completed
-
+h_ww = None
         
-def sensor_ar(theta_t, phi_t, Rb, angle, FOM): 
+def sensor_ar(theta_t, phi_t, Rb, angle, FOM, r_sensor = None, params_d = None): 
     global h_ww
-    global designs
     angle_rad = np.pi/180 * angle
     m = ut.half_angle_to_order(angle_rad)
     nS = ut.spher_to_cart_ar(1, theta_t, phi_t)
-    designs[KEY]['nS_sensor'] = nS
-    designs[KEY]['Rb_sensor'] = Rb 
-    designs[KEY]['m_sensor'] = int(m)
-    l = sensor_net( **designs[KEY] ) 
+    params_d['r_sensor'] = r_sensor
+    params_d['nS_sensor'] = nS
+    params_d['Rb_sensor'] = Rb 
+    params_d['m_sensor'] = int(m)
+    l = sensor_net( **params_d ) 
     l.calch(h_ww = h_ww)
     l.light_sim()
     l.calc_noise()
@@ -66,17 +61,17 @@ def sensor_ar(theta_t, phi_t, Rb, angle, FOM):
 
 def ga_optimization(d):
     global h_ww
-    global designs
     i = d['i']
     j = d['j']
     x = d['x']
     y = d['y']
+    designs = d['designs']
     KEY = d['KEY']
     FOM = d['FOM']
-    fitness_fun = lambda params: sensor_ar(params[0], params[1], params[2], 60, FOM)
-    
     r_sensor = np.array([x, y, 0])
-    designs[KEY]['r_sensor'] = r_sensor
+    fitness_fun = lambda params: sensor_ar(params[0], params[1], params[2], 60, FOM, r_sensor = r_sensor, 
+                                           params_d = designs[KEY])    
+
     print('i = %d / %d, j = %d / %d sensor at %s, initiating pool.' %(i, x.size, j, y.size, r_sensor) )              
     
     g = ga.population( noChromosomes = 50,
@@ -138,28 +133,33 @@ for i, xc in enumerate(x):
          'j' : i,
          'x' : xc,
          'y' : yc,
-         'KEY' : 'C',
-         'FOM' : 'tb_diff'
+         'KEY' : KEY,
+         'FOM' : 'tb_diff',
+         'designs' : designs
         })
     
     pool_args.append({'i' : i,
          'j' : i,
          'x' : xc,
          'y' : yc,
-         'KEY' : 'C',
-         'FOM' : 'tb_tot'
+         'KEY' : KEY,
+         'FOM' : 'tb_tot',
+         'designs' : designs
+
         })
     
     pool_args.append({'i' : i,
          'j' : i,
          'x' : xc,
          'y' : yc,
-         'KEY' : 'C',
-         'FOM' : 'tb_los'
+         'KEY' : KEY,
+         'FOM' : 'tb_los',
+         'designs' : designs
+
         })
     
          
-pool = Pool(processes = 16)
+pool = Pool(processes = 1)
 results = pool.map_async( ga_optimization, pool_args ).get()
 with open(FILENAME, 'wb') as f:
     pickle.dump(results, f)
