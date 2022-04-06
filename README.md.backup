@@ -77,7 +77,7 @@ creates a set of 30 x and y pairs corresponding to the diagonal of the ceiling.
 
 Note that the `h_ww` is a global variable that is used in diffuse channel calculations. It represents the gains between all elementary subsurfaces of the room that are used in the diffuse channel model. You only need to calculate this once, since they are independent on the parameters of the SN and MN
 
-We next define a function `sensor_ar` that is used to estimate the battery life of an SN. The battery life is the fitness function, i.e. the measure to be used in the optimizations.
+We next define a function `sensor_ar` that is used to estimate the battery lif SNs.
 
 ### Master node transimpendance amplifier (MN-TIA)
 ```

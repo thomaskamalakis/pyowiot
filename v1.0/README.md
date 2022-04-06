@@ -1,11 +1,8 @@
 # pyowiot
-`Pyowiot` is an open-source Python3 library that can be used to design optical wireless systems for internet-of-things (IoT) applications. It contains many components describing the optical wireless channel and transceiver model as well as an optimization engine based on a genetic algorithm.
+This is an open-source Python3 library that can be used to design optical wireless systems for internet-of-things (IoT) applications
 
 ## Funding support
-We wrote this code under COST action NewFocus CA19111. Official acknowledgment is as follows:
-
-> This software was based upon work from COST Action
-NEWFOCUS CA19111, supported by COST (European Cooperation in Science and Technology)
+We wrote this code under COST action NewFocus CA19111.
 
 ## What is all about?
 We can use this library to simulate a typical optical wireless system used for IoT. We assume a master node (MN) placed somewhere in a room (preferably the ceiling). The master node uses visible light communications (VLC) to send acknowledgment messages to sensor nodes (SNs) also placed inside the room. There are two main components of the model: the physical layer (PHY) and the power consumption model (PCM). Typically we expect the SN transmitted to be in the infrared (IR) range, e.g. an IR light emitting diode (LED). On the other hand, the MN would use a visible LED which could provide both illumination in the room and communication with the SNs.
@@ -13,71 +10,14 @@ We can use this library to simulate a typical optical wireless system used for I
 ## PHY model
 The PHY model deals with all sorts of details of the communications system including:
   - transmitter model: radiation pattern (Lorentzian or extended Lorentzian), light/current characteristic.
-  - channel gain: 
-  	- line-of-sight (LOS) components from the MN to the SN and vice-versa.
-  	- diffuse propagation: we use a fast method for estimating the diffuse power impinging on the MN
+  - channel gain: line-of-sight components from the MN to the SN and vice-versa.
   - receiver model: spectral matching, responsivity, optical rejection filter, ambient light noise, amplifier noise.
-
-## Can you give me more info on the models?
-The is a paper describing the LOS model and transceiver model:
-> T. Kamalakis, Z. Ghassemlooy, S. Zvanovec, and L.N. Alves, “Analysis and simulation of a hybrid visible-light/infrared optical wireless network for IoT applications,” Journal of Optical Communications and Networking 14, 69-78 (2022). DoI: 10.1364/JOCN.442787 
-
-You can download the paper [here](https://www.newfocus-cost.eu/wp-content/uploads/2022/01/442787-1.pdf).
-
-We have also submitted a second paper describing the genetic algorithm and the diffuse channel model which will be made available if it gets accepted. An earlier version of the genetic algorithm used in this work can be found [here](https://galaxy.hua.gr/~thkam/Publications/Journals/optics_communications_2021.pdf).
 
 ## Requirements
 It requires `scipy`, `numpy` and `matplotlib`. Install them using `pip3`
 
-## Documentation
-Definitely not complete yet. Will be adding further documentation in due time.
-
-## What is contained in this repo?
-There are several quick-start examples in the repo and others will be added soon. 
-
-- `opt_room_pool_A.py` is an example regarding the optimization of the SN along the diagonal of the floor of a 5m x 5m x 3.5m room with the MN located at the center of the ceiling.
-- `opt_room_pool_C.py` is the same as above but the room is larger, 10m x 10m x 4m 
-
-You can use the `opt_floor_plot_A.py` and `opt_floor_plot_C.py` to plot the results of the simulations. Additional files include:
-- `libow8.py` is the library file containing the transceiver, LOS and diffuse channel model.
-- `mixed_ga.py` contains the implementation of the genetic algorithm.
-- `owutils.py` contains some utility functions (but no classes!)
-- `defaults.py` defines some constants and default values for the various parameters of the model. 
-- `designs.py` contains some example room configurations.
-
-Basically you need to define the system parameters one step at the time for each subsystem of the VLC/IR link. At the very least, you need to specify the following things in a bottom up approach. Here are some important points from `sysdesign_wide.py` you need to pay attention to.
-
-## How do I use your code?
-At this stage, it is preferable to start from one quick-start example (e.g.`opt_room_pool_A.py`) and work your way through. Taking `opt_room_pool_A.py` as a starting point:
-
-- provide a file where your results will be stored. The `FILENAME` variable is used for this purpose.
-- define a variable map type for the genetic algorithm. In this example we run the optimizations over three real-valued variables: elevation, azimuth and data rate. So the map is 
-```
-map_type = 'R' * 3`
-```
-
-implying three real-valued variables. Except `'R'` you can specify `'I'` implying integer-valued variables.
-
-Next you need to provide the ranges of these variables using the `mins` and `maxs` variables.
-```
-mins = np.array([0, 0, 1e3])
-```
-signifies that the first two variables (elevation and azimuth) will have minimum value equal to zero and the third (data rate) will have a minimum value of `1e3` (i.e., 1 kb/s ). In a similar fashion 
-`maxs` determines the upper bounds for these parameters.
-
-You then define the positions of the sensor nodes to be considered. 
-```
-Nx = 30
-L = designs[KEY]['room_L']
-W = designs[KEY]['room_W']    
-x = L * np.arange(1, Nx + 1) / (Nx+1)
-y = W * np.arange(1, Nx + 1) / (Nx+1)
-```
-creates a set of 30 x and y pairs corresponding to the diagonal of the ceiling.
-
-Note that the `h_ww` is a global variable that is used in diffuse channel calculations. It represents the gains between all elementary subsurfaces of the room that are used in the diffuse channel model. You only need to calculate this once, since they are independent on the parameters of the SN and MN
-
-We next define a function `sensor_ar` that is used to estimate the battery life of an SN. The battery life is the fitness function, i.e. the measure to be used in the optimizations.
+## How to use it
+`libow.py` is the library file, `sysdesign_wide.py` is an example of how to use the library. Basically you need to define the system parameters one step at the time for each subsystem of the VLC/IR link. At the very least, you need to specify the following things in a bottom up approach. Here are some important points from `sysdesign_wide.py` you need to pay attention to.
 
 ### Master node transimpendance amplifier (MN-TIA)
 ```
